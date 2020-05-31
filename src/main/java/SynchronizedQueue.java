@@ -1,36 +1,43 @@
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
-    private final LinkedList<E> items = new LinkedList<>();
+    private final LinkedList<E> queue = new LinkedList<>();
     @Getter
     private final int capacity;
 
-    public SynchronizedQueue(int limit) {
-        this.capacity = limit;
-    }
-
-
-    @Override
-    public boolean add(E e) {
-        return false;
+    public SynchronizedQueue(int capacity) {
+        if (capacity <= 0)
+            throw new IllegalArgumentException();
+        this.capacity = capacity;
     }
 
     @Override
-    public boolean offer(E e) {
-        return false;
+    public synchronized boolean add(E e) {
+        if (queue.size() < capacity) {
+            queue.add(e);
+            return true;
+        } else throw new IllegalStateException();
+    }
+
+    @Override
+    public synchronized boolean offer(E e) {
+        if (queue.size() < capacity) {
+            queue.add(e);
+            return true;
+        } else return false;
     }
 
     @Override
     public E remove() {
-        return items.remove();
+        return queue.remove();
     }
 
     @Override
@@ -40,23 +47,25 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public E element() {
-        return null;
+        if (queue.isEmpty()) {
+            throw new NoSuchElementException();
+        } else return queue.peek();
     }
 
     @Override
     public E peek() {
-        return null;
+        return queue.peek();
     }
 
     @Override
     public synchronized void put(E e) throws InterruptedException {
-        while (this.items.size() == this.capacity) {
+        while (this.queue.size() == this.capacity) {
             wait();
         }
-        if (this.items.size() == 0) {
+        if (this.queue.size() == 0) {
             notifyAll();
         }
-        this.items.add(e);
+        this.queue.add(e);
     }
 
     @Override
@@ -66,14 +75,14 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public E take() throws InterruptedException {
-        while (this.items.size() == 0) {
+        while (this.queue.size() == 0) {
             wait();
         }
-        if (this.items.size() == this.capacity) {
+        if (this.queue.size() == this.capacity) {
             notifyAll();
         }
 
-        return this.items.remove(0);
+        return this.queue.remove(0);
     }
 
     @Override
@@ -82,69 +91,71 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public int remainingCapacity() {
-        return 0;
+    public synchronized int remainingCapacity() {
+        return queue.size() - capacity;
     }
 
     @Override
     public boolean remove(Object o) {
-        return items.remove(o);
+        return queue.remove(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return items.containsAll(c);
+        return queue.containsAll(c);
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        // todo посмотреть размер
-        return items.addAll(c);
+        if (c.size() > capacity) {
+            throw new IllegalArgumentException();
+        } else return queue.addAll(c);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return items.removeAll(c);
+        return queue.removeAll(c);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        return queue.retainAll(c);
     }
 
     @Override
     public void clear() {
-        items.clear();
+        queue.clear();
     }
 
     @Override
     public int size() {
-        return items.size();
+        return queue.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return items.isEmpty();
+        return queue.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return items.contains(o);
+        return queue.contains(o);
     }
 
     @Override
     public Iterator<E> iterator() {
-        return items.iterator();
+        return queue.iterator();
     }
 
     @Override
     public Object[] toArray() {
-        return Arrays.copyOf(items.toArray(), capacity);
+        return queue.toArray();
     }
 
     @Override
+    @SuppressWarnings("all")
     public <T> T[] toArray(T[] a) {
-        return items.toArray(a);
+        return queue.toArray(a);
     }
 
     @Override
