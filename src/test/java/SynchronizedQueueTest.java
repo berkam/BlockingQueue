@@ -51,47 +51,7 @@ public class SynchronizedQueueTest {
     }
 
     @Test
-    public void testContainsAll() {
-    }
-
-    @Test
     public void testAddAll() {
-    }
-
-    @Test
-    public void testRemoveAll() {
-    }
-
-    @Test
-    public void testRetainAll() {
-    }
-
-    @Test
-    public void testClear() {
-    }
-
-    @Test
-    public void testSize() {
-    }
-
-    @Test
-    public void testIsEmpty() {
-    }
-
-    @Test
-    public void testContains() {
-    }
-
-    @Test
-    public void testIterator() {
-    }
-
-    @Test
-    public void testToArray() {
-    }
-
-    @Test
-    public void testTestToArray() {
     }
 
     @Test

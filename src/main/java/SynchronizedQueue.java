@@ -1,22 +1,23 @@
-import lombok.Getter;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     private final LinkedList<E> queue = new LinkedList<>();
-    @Getter
+
     private final int capacity;
 
     public SynchronizedQueue(int capacity) {
         if (capacity <= 0)
             throw new IllegalArgumentException();
         this.capacity = capacity;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     @Override
@@ -36,24 +37,22 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public E remove() {
+    public synchronized E remove() {
         return queue.remove();
     }
 
     @Override
-    public E poll() {
-        return null;
+    public synchronized E poll() {
+        return queue.poll();
     }
 
     @Override
-    public E element() {
-        if (queue.isEmpty()) {
-            throw new NoSuchElementException();
-        } else return queue.peek();
+    public synchronized E element() {
+        return queue.element();
     }
 
     @Override
-    public E peek() {
+    public synchronized E peek() {
         return queue.peek();
     }
 
@@ -69,8 +68,19 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        return false;
+    public synchronized boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
+        long millis = unit.toMillis(timeout);
+        long currentTime = System.currentTimeMillis();
+
+        while (queue.size() == capacity) {
+            if (millis <= 0)
+                return false;
+            Thread.currentThread().wait(millis);
+            millis -= System.currentTimeMillis() - currentTime;
+        }
+
+        queue.add(e);
+        return true;
     }
 
     @Override
