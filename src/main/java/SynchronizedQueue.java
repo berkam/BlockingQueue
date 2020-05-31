@@ -1,13 +1,13 @@
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     private final LinkedList<E> queue = new LinkedList<>();
-
     private final int capacity;
 
     public SynchronizedQueue(int capacity) {
@@ -16,23 +16,17 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
         this.capacity = capacity;
     }
 
-    public int getCapacity() {
-        return capacity;
-    }
-
     @Override
     public synchronized boolean add(E e) {
         if (queue.size() < capacity) {
-            queue.add(e);
-            return true;
+            return queue.add(e);
         } else throw new IllegalStateException();
     }
 
     @Override
     public synchronized boolean offer(E e) {
         if (queue.size() < capacity) {
-            queue.add(e);
-            return true;
+            return queue.add(e);
         } else return false;
     }
 
@@ -58,13 +52,13 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public synchronized void put(E e) throws InterruptedException {
-        while (this.queue.size() == this.capacity) {
+        while (queue.size() == capacity) {
             wait();
         }
-        if (this.queue.size() == 0) {
+        if (queue.isEmpty()) {
             notifyAll();
         }
-        this.queue.add(e);
+        queue.add(e);
     }
 
     @Override
@@ -97,7 +91,17 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        return null;
+        long millis = unit.toMillis(timeout);
+        long currentTime = System.currentTimeMillis();
+
+        while (queue.isEmpty()) {
+            if (millis <= 0)
+                return null;
+            Thread.currentThread().wait(millis);
+            millis -= System.currentTimeMillis() - currentTime;
+        }
+
+        return queue.remove(0);
     }
 
     @Override
@@ -169,12 +173,23 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public int drainTo(Collection<? super E> c) {
-        return 0;
+    public synchronized int drainTo(Collection<? super E> c) {
+        return drainTo(c, Integer.MAX_VALUE);
     }
 
     @Override
-    public int drainTo(Collection<? super E> c, int maxElements) {
-        return 0;
+    public synchronized int drainTo(Collection<? super E> c, int maxElements) {
+        Objects.requireNonNull(c);
+        if (c == this)
+            throw new IllegalArgumentException();
+        if (maxElements <= 0)
+            return 0;
+        int n = 0;
+        for (E first; n < maxElements && (first = queue.peek()) != null; ) {
+            c.add(first);
+            queue.poll();
+            ++n;
+        }
+        return n;
     }
 }
