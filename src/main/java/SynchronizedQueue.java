@@ -1,3 +1,5 @@
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -8,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     private final LinkedList<E> items = new LinkedList<>();
-    private int capacity;
-
+    @Getter
+    private final int capacity;
 
     public SynchronizedQueue(int limit) {
         this.capacity = limit;
@@ -28,7 +30,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public E remove() {
-        return null;
+        return items.remove();
     }
 
     @Override
@@ -47,8 +49,14 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public void put(E e) throws InterruptedException {
-
+    public synchronized void put(E e) throws InterruptedException {
+        while (this.items.size() == this.capacity) {
+            wait();
+        }
+        if (this.items.size() == 0) {
+            notifyAll();
+        }
+        this.items.add(e);
     }
 
     @Override
@@ -58,7 +66,14 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public E take() throws InterruptedException {
-        return null;
+        while (this.items.size() == 0) {
+            wait();
+        }
+        if (this.items.size() == this.capacity) {
+            notifyAll();
+        }
+
+        return this.items.remove(0);
     }
 
     @Override
@@ -73,12 +88,12 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return items.remove(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        return items.containsAll(c);
     }
 
     @Override
@@ -129,13 +144,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public <T> T[] toArray(T[] a) {
-        if (a.length < capacity)
-            // Make a new array of a's runtime type, but my contents:
-            return (T[]) Arrays.copyOf(new LinkedList[]{items}, capacity, a.getClass());
-        System.arraycopy(items, 0, a, 0, capacity);
-        if (a.length > capacity)
-            a[capacity] = null;
-        return a;
+        return items.toArray(a);
     }
 
     @Override
