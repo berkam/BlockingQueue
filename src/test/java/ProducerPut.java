@@ -1,11 +1,11 @@
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
-class Producer implements Runnable {
-    private final BlockingQueue<Integer> queue;
+class ProducerPut extends AbstractProducer implements Runnable {
 
-    public Producer(BlockingQueue<Integer> queue) {
-        this.queue = queue;
+    public ProducerPut(BlockingQueue<Integer> queue) {
+        super(queue);
+
     }
 
     @Override
@@ -21,7 +21,7 @@ class Producer implements Runnable {
         }
     }
 
-    private Integer produce() {
+    protected Integer produce() {
         Integer i = new Random().nextInt(100);
         System.out.println("[Producer] produce: " + i);
         return i;

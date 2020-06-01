@@ -13,10 +13,10 @@ public class SynchronizedQueueTest {
     @Test
     public void testConcurrent() throws InterruptedException {
         BlockingQueue<Integer> queue = new SynchronizedQueue<>(5);
-        new Thread(new Producer(queue)).start();
+        new Thread(new ProducerPut(queue)).start();
         Thread.sleep(1000);
         assertEquals(queue.size(), 5);
-        new Thread(new Consumer(queue)).start();
+        new Thread(new ConsumerTake(queue)).start();
     }
 
     @Test

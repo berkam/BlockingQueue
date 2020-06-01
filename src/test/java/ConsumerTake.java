@@ -1,10 +1,9 @@
 import java.util.concurrent.BlockingQueue;
 
-public class Consumer implements Runnable {
-    private final BlockingQueue<Integer> queue;
+public class ConsumerTake extends AbstractConsumer {
 
-    public Consumer(BlockingQueue<Integer> queue) {
-        this.queue = queue;
+    public ConsumerTake(BlockingQueue<Integer> queue) {
+        super(queue);
     }
 
     @Override
@@ -20,7 +19,7 @@ public class Consumer implements Runnable {
         }
     }
 
-    private void consume() throws InterruptedException {
+    protected void consume() throws InterruptedException {
         Integer i = queue.take();
         System.out.println("[Consumer] consumed: " + i);
     }
