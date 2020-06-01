@@ -2,6 +2,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -63,30 +64,57 @@ public class SynchronizedQueueTest {
 
     @Test
     public void testPoll() {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
+        assertEquals(synchronizedQueue.poll(), Integer.valueOf(1));
+        assertEquals(synchronizedQueue.size(), 4);
+    }
+
+    @Test
+    public void testPollEmpty() {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+
+        assertNull(synchronizedQueue.poll());
     }
 
     @Test
     public void testElement() {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
+        assertEquals(synchronizedQueue.element(), Integer.valueOf(1));
+        assertEquals(synchronizedQueue.size(), 5);
+    }
+
+    @Test
+    public void testElementEmpty() {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+
+        expectThrows(NoSuchElementException.class, synchronizedQueue::element);
     }
 
     @Test
     public void testPeek() {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
+        assertEquals(synchronizedQueue.peek(), Integer.valueOf(1));
+        assertEquals(synchronizedQueue.size(), 5);
+    }
+
+    @Test
+    public void testPeekEmpty() {
+        assertNull(new SynchronizedQueue<>(5).peek());
     }
 
     @Test
     public void testPut() {
     }
 
-    @Test
-    public void testTestOffer() {
-    }
 
     @Test
     public void testTake() {
-    }
-
-    @Test
-    public void testTestPoll() {
     }
 
     @Test
