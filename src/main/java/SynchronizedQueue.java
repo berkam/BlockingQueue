@@ -69,7 +69,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
         while (queue.size() == capacity) {
             if (millis <= 0)
                 return false;
-            Thread.currentThread().wait(millis);
+            wait(millis);
             millis -= System.currentTimeMillis() - currentTime;
         }
 
@@ -89,14 +89,14 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+    public synchronized E poll(long timeout, TimeUnit unit) throws InterruptedException {
         long millis = unit.toMillis(timeout);
         long currentTime = System.currentTimeMillis();
 
         while (queue.isEmpty()) {
             if (millis <= 0)
                 return null;
-            Thread.currentThread().wait(millis);
+            wait(millis);
             millis -= System.currentTimeMillis() - currentTime;
         }
 

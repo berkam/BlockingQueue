@@ -13,10 +13,10 @@ public class SynchronizedQueueTest {
     @Test
     public void testConcurrent() throws InterruptedException {
         BlockingQueue<Integer> queue = new SynchronizedQueue<>(5);
-        new Thread(new ProducerPut(queue)).start();
+        new Thread(new Producer(queue)).start();
         Thread.sleep(1000);
         assertEquals(queue.size(), 5);
-        new Thread(new ConsumerTake(queue)).start();
+        new Thread(new Consumer(queue)).start();
     }
 
     @Test
@@ -55,6 +55,13 @@ public class SynchronizedQueueTest {
     }
 
     @Test
+    public void testOfferWithTimeNegative() throws InterruptedException {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        assertFalse(synchronizedQueue.offer(6, 100L, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
     public void testRemove() {
         BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
         synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
@@ -78,6 +85,22 @@ public class SynchronizedQueueTest {
         BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
 
         assertNull(synchronizedQueue.poll());
+    }
+
+    @Test
+    public void testPollWithTime() throws InterruptedException {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
+        assertEquals(synchronizedQueue.poll(100L, TimeUnit.MILLISECONDS), Integer.valueOf(1));
+        assertEquals(synchronizedQueue.size(), 4);
+    }
+
+    @Test
+    public void testPollWithTimeEmpty() throws InterruptedException {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+
+        assertNull(synchronizedQueue.poll(100L, TimeUnit.MILLISECONDS));
     }
 
     @Test

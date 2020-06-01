@@ -1,11 +1,12 @@
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
-class ProducerPut extends AbstractProducer implements Runnable {
+class Producer implements Runnable {
 
-    public ProducerPut(BlockingQueue<Integer> queue) {
-        super(queue);
+    protected final BlockingQueue<Integer> queue;
 
+    public Producer(BlockingQueue<Integer> queue) {
+        this.queue = queue;
     }
 
     @Override

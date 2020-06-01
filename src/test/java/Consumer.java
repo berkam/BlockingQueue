@@ -1,9 +1,11 @@
 import java.util.concurrent.BlockingQueue;
 
-public class ConsumerTake extends AbstractConsumer {
+public class Consumer implements Runnable {
 
-    public ConsumerTake(BlockingQueue<Integer> queue) {
-        super(queue);
+    private final BlockingQueue<Integer> queue;
+
+    public Consumer(BlockingQueue<Integer> queue) {
+        this.queue = queue;
     }
 
     @Override
