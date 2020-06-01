@@ -106,7 +106,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
 
     @Override
     public synchronized int remainingCapacity() {
-        return queue.size() - capacity;
+        return capacity - queue.size();
     }
 
     @Override
