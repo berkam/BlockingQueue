@@ -74,6 +74,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
         }
 
         queue.add(e);
+        notifyAll();
         return true;
     }
 
@@ -99,7 +100,7 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
             wait(millis);
             millis -= System.currentTimeMillis() - currentTime;
         }
-
+        notifyAll();
         return queue.remove(0);
     }
 
