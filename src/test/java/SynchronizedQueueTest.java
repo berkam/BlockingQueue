@@ -109,12 +109,20 @@ public class SynchronizedQueueTest {
     }
 
     @Test
-    public void testPut() {
+    public void testPut() throws InterruptedException {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(6);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        synchronizedQueue.put(6);
+        assertTrue(synchronizedQueue.contains(6));
     }
 
-
     @Test
-    public void testTake() {
+    public void testTake() throws InterruptedException {
+        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
+        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
+        assertEquals(synchronizedQueue.take(), Integer.valueOf(1));
+        assertEquals(synchronizedQueue.size(), 4);
     }
 
     @Test
