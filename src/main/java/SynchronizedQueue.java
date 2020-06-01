@@ -78,14 +78,13 @@ public class SynchronizedQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public E take() throws InterruptedException {
+    public synchronized E take() throws InterruptedException {
         while (this.queue.size() == 0) {
             wait();
         }
         if (this.queue.size() == this.capacity) {
-            notifyAll();
+            notify();
         }
-
         return this.queue.remove(0);
     }
 

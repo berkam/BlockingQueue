@@ -11,6 +11,15 @@ import static org.testng.Assert.*;
 public class SynchronizedQueueTest {
 
     @Test
+    public void testConcurrent() throws InterruptedException {
+        BlockingQueue<Integer> queue = new SynchronizedQueue<>(5);
+        new Thread(new Producer(queue)).start();
+        Thread.sleep(1000);
+        assertEquals(queue.size(), 5);
+        new Thread(new Consumer(queue)).start();
+    }
+
+    @Test
     public void testAddPositive() {
         BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(6);
         synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
@@ -43,13 +52,6 @@ public class SynchronizedQueueTest {
         BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(6);
         synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
         assertTrue(synchronizedQueue.offer(6, 100L, TimeUnit.MILLISECONDS));
-    }
-
-    @Test
-    public void testOfferWithTimeNegative() throws InterruptedException {
-        BlockingQueue<Integer> synchronizedQueue = new SynchronizedQueue<>(5);
-        synchronizedQueue.addAll(Arrays.asList(1, 2, 3, 4, 5));
-        assertFalse(synchronizedQueue.offer(6, 100L, TimeUnit.MILLISECONDS));
     }
 
     @Test
